@@ -1,3 +1,5 @@
+// 📌 Milestone 1
+
 type Person = {
   readonly id: number;
   readonly name: string;
@@ -6,6 +8,8 @@ type Person = {
   biography: string;
   image: string;
 }
+// 📌 Milestone 2
+
 
 type Nationality = "American" | "British" | "Australian" | "Israeli-American" | "South African" | "French" | "Indian" | "Israeli" | "Spanish" | "South Korean" | "Chinese";
 
@@ -14,6 +18,10 @@ type Actress = Person & {
   awards: string;
   nationality: Nationality
 }
+
+
+// 📌 Milestone 3
+
 
 function isActress(data: any): data is Actress {
   if (typeof data !== 'object' || data === null) {
@@ -73,6 +81,9 @@ getActress(1)
   })
 
 
+// 📌 Milestone 4
+
+
 async function getAllActress(): Promise<Actress | null> {
   const endpoint = `http://localhost:3333/actresses`
 
@@ -92,6 +103,22 @@ async function getAllActress(): Promise<Actress | null> {
 
 getAllActress()
 
+
+// 📌 Milestone 5
+
+
+async function getActresses(ids: number[]): Promise<(Actress | null)[]> {
+  const actressPromises = ids.map(id => getActress(id));
+
+  const results = await Promise.all(actressPromises);
+
+  return results;
+}
+
+getActresses([1, 2, 3])
+  .then(actress => {
+    console.log(actress)
+  })
 
 
 
