@@ -59,12 +59,10 @@ async function getActress(id: number): Promise<Actress | null> {
     if (isActress(data)) {
       return data;
     } else {
-      console.error(`Errore: i dati ricevuti per l'attrice con ID ${id} non corrispondono alla struttura attesa.`);
       console.error('Dati ricevuti:', data);
       return null;
     }
   } catch (error) {
-    console.error(`Si è verificato un errore durante il recupero dell'attrice con ID ${id}:`, error);
     return null;
   }
 }
@@ -73,5 +71,28 @@ getActress(1)
   .then(actress => {
     console.log(actress)
   })
+
+
+async function getAllActress(): Promise<Actress | null> {
+  const endpoint = `http://localhost:3333/actresses`
+
+  try {
+    const response = await fetch(endpoint);
+    const data: unknown = await response.json();
+    if (isActress(data)) {
+      return data;
+    } else {
+      console.error('Dati ricevuti:', data);
+      return null;
+    }
+  } catch (error) {
+    return null;
+  }
+}
+
+getAllActress()
+
+
+
 
 
