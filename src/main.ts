@@ -107,17 +107,44 @@ getAllActress()
 
 
 async function getActresses(ids: number[]): Promise<(Actress | null)[]> {
-  const actressPromises = ids.map(id => getActress(id));
+  try {
+    const promises = ids.map(id => getActress(id))
+    return await Promise.all(promises)
 
-  const results = await Promise.all(actressPromises);
-
-  return results;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Errore durante recuper attrici", error)
+    } else {
+      console.error("errore sconosciuto", error)
+    }
+    return [];
+  }
 }
 
 getActresses([1, 2, 3])
   .then(actress => {
     console.log(actress)
   })
+
+
+//   🎯 BONUS 1
+
+function createActress(data: Omit<Actress, "id">): Actress {
+  return {
+    ...data,
+    id: Math.floor(Math.random() * 10000)
+  }
+}
+
+function updateActress(actress: Actress, updates: Partial<Actress>): Actress {
+  return {
+    ...actress,
+    ...updates,
+    id: actress.id,
+    name: actress.name
+  }
+}
+
 
 
 
