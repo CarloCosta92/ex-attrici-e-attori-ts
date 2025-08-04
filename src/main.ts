@@ -23,38 +23,21 @@ type Actress = Person & {
 // 📌 Milestone 3
 
 
-function isActress(data: any): data is Actress {
-  if (typeof data !== 'object' || data === null) {
-    return false;
-  }
+function isActress(data: unknown): data is Actress {
+  return (
+    typeof data === "object" &&
+    data !== null &&
+    "id" in data && typeof data.id === "number" &&
+    "name" in data && typeof data.name === "string" &&
+    "birth_year" in data && typeof data.birth_year === "number" &&
+    ("death_year" in data ? typeof (data as any).death_year === "number" : true) &&
+    "biography" in data && typeof data.biography === "string" &&
+    "image" in data && typeof data.image === "string" &&
+    "most_famous_movies" in data && data.most_famous_movies instanceof Array && data.most_famous_movies.length === 3 && data.most_famous_movies.every(m => typeof m === "string") &&
+    "awards" in data && typeof data.awards === "string" &&
+    "nationality" in data && typeof data.nationality === "string"
+  )
 
-  if (
-    typeof data.id !== 'number' ||
-    typeof data.name !== 'string' ||
-    typeof data.birth_year !== 'number' ||
-    (data.death_year !== undefined && typeof data.death_year !== 'number') ||
-    typeof data.biography !== 'string' ||
-    typeof data.image !== 'string'
-  ) {
-    return false;
-  }
-
-  if (
-    !Array.isArray(data.most_famous_movies) ||
-    data.most_famous_movies.length !== 3 ||
-    !data.most_famous_movies.every((movie: any) => typeof movie === 'string') ||
-    typeof data.awards !== 'string' ||
-    typeof data.nationality !== 'string'
-  ) {
-    return false;
-  }
-
-  const allowedNationalities: Nationality[] = ["American", "British", "Australian", "Israeli-American", "South African", "French", "Indian", "Israeli", "Spanish", "South Korean", "Chinese"];
-  if (!allowedNationalities.includes(data.nationality)) {
-    return false;
-  }
-
-  return true;
 }
 
 
@@ -64,13 +47,16 @@ async function getActress(id: number): Promise<Actress | null> {
   try {
     const response = await fetch(endpoint);
     const data: unknown = await response.json();
-    if (isActress(data)) {
-      return data;
-    } else {
-      console.error('Dati ricevuti:', data);
-      return null;
+    if (!isActress(data)) {
+      throw new Error("Formato dati non valido")
     }
+    return data;
   } catch (error) {
+    if (error instanceof Error) {
+      console.error("Errore durante recuper attrice", error)
+    } else {
+      console.error("errore sconosciuto", error)
+    }
     return null;
   }
 }
@@ -84,24 +70,37 @@ getActress(1)
 // 📌 Milestone 4
 
 
-async function getAllActress(): Promise<Actress | null> {
+async function getAllActress(): Promise<Actress[]> {
   const endpoint = `http://localhost:3333/actresses`
 
   try {
     const response = await fetch(endpoint);
-    const data: unknown = await response.json();
-    if (isActress(data)) {
-      return data;
-    } else {
-      console.error('Dati ricevuti:', data);
-      return null;
+    if (!response.ok) {
+      throw new Error(`errore http ${response.status}: ${response.statusText}`)
     }
+    const data: unknown = await response.json();
+
+    if (!(data instanceof Array)) {
+      throw new Error("Formato non valido")
+    }
+
+    const attriciValide: Actress[] = data.filter(isActress)
+    return attriciValide;
+
   } catch (error) {
-    return null;
+    if (error instanceof Error) {
+      console.error("Errore durante recuper attrici", error)
+    } else {
+      console.error("errore sconosciuto", error)
+    }
+    return [];
   }
 }
 
 getAllActress()
+  .then(actress => {
+    console.log(actress)
+  })
 
 
 // 📌 Milestone 5
